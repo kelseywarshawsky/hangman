@@ -5,10 +5,10 @@ var wins = 0;
 var losses = 0;
 var guesses = 5;
 var userWork = [];
+var userMessage = "Temp"
 var wrongLetters = [];
 var wordPrint = false;
 var computerWord = computerChoices[Math.floor(Math.random() * computerChoices.length)];
-var letterInWord = false;
 var computerLetters = computerWord.split('')
 
 var winsText = document.getElementById("wins-text");
@@ -17,24 +17,31 @@ var wrongText = document.getElementById("wrong-text");
 var guessesText = document.getElementById("guesses-text");
 var workText = document.getElementById("work-text");
 
-function printWord() {
-  userWork = [];
-  for (var i = 0; i < computerLetters.length; i++) {
-    if (wordPrint === false) {
-      userWork.push(" _ ");
-    }
-    wordPrint === true
-    workText.textContent = userWork;
-  }
+function gottaString() {
+  displayWord = userWork.join("");
+  checkWin = computerLetters.join("");
 
 }
 
+function printWord() {
+    if (wordPrint === false) {
+      for (var i = 0; i < computerLetters.length; i++) {
+      userWork.push(" _ ");
+      wordPrint = true
+      }
+    }
+    else {
+      console.log("not printing")
+    }
+  }
+
+
 function match(userGuess) {
+  var letterInWord = false;
   for (var i = 0; i < computerLetters.length; i++) {
     if ((userGuess === computerLetters[i])) {
       userWork[i] = userGuess;
-      letterInWord === true;
-      console.log("matched letter")
+      letterInWord = true;
     } else if ((userGuess !== computerLetters[i])) {
       console.log("mismatch" + letterInWord)
     }
@@ -45,53 +52,62 @@ function match(userGuess) {
     }
   }
 
-function win(guesses, losses, wrongLetters, userWork, computerWord) {
-if (userWork === computerWord) {
+function win() {
+  gottaString();
+if (displayWord === checkWin) {
+  userMessage = "You win! The word was " + computerWord
   guesses = 5;
   wins++
   wrongLetters = [];
+  userWork = [];
   computerWord = computerChoices[Math.floor(Math.random() * computerChoices.length)];
   computerLetters = computerWord.split('')
-  for (var i = 0; i < computerLetters.length; i++) {
-    userWork.push("_ ")
-  }
-  alert("you've won!")
+  wordPrint = false;
+  printWord();
+  $('#modal').modal('show')
 } else if (userWork !== computerWord) {
-  console.log("didn't win")
+  userMessage = "nothing"
   }
 }
 
-function lose(guesses, losses, wrongLetters, userWork) {
+function lose() {
 if (guesses < 1) {
+  userMessage = "You lost! The word was " + computerWord
   guesses = 5;
   losses++
-  wrongLetters === [];
-  userWork === [];
+  wrongLetters = [];
+  userWork = [];
+  wordPrint = false; 
+  $('#modal').modal('show')
   computerWord = computerChoices[Math.floor(Math.random() * computerChoices.length)];
   computerLetters = computerWord.split('')
-  alert("you lost!")
+  
 } else if (guesses > 1) {
-  console.log("enough guesses to continue")
+  userMessage = "nothing"
 }
 }
 
-function populateText(wins, losses, guesses, wrongLetters, userWork) {
+function populateText() {
+  gottaString();
   winsText.textContent = "wins: " + wins;
   lossesText.textContent = "losses: " + losses;
   guessesText.textContent = "guesses: " + guesses;
   wrongText.textContent = wrongLetters;
-  workText.textContent = userWork;
+  workText.textContent = displayWord;
+  $("#modal-title").html(userMessage)
+  $("#modal-body").html("The animal was " + computerWord + "<br>" + "<img src='../images/" + computerWord + ".png>")
 
 }
 
 document.onkeyup = function (event) {
   var userGuess = event.key;
 
-  printWord(letterInWord);
-  populateText(wins, guesses, losses, wrongLetters, userWork);
-  match();
-  win(guesses, losses, wrongLetters, userWork, computerWord);
-  lose(guesses, losses, wrongLetters, userWork);
+  printWord(wordPrint);
+  populateText(userWork, userMessage);
+  match(userGuess);
+  win(userWork, computerLetters);
+  lose(guesses);
+  populateText(userWork, userMessage);
 
 
 
